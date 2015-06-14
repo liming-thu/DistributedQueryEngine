@@ -53,6 +53,7 @@ namespace DistributedQueryService
         {
             Sql2AlgTree sat = new Sql2AlgTree(sql);
             Node AlgTreeRoot = sat.GetAlgTree();//generate alg tree
+            string originTree = sat.GetJSONAlgTree(AlgTreeRoot);
             sat.ReplaceLeafWithSiteInfo(AlgTreeRoot);//replace leaf node with site info
             sat.AlgTreeOpt(AlgTreeRoot);//optimize alg tree, do SEL and PROJ as early as possible
             //
@@ -65,8 +66,8 @@ namespace DistributedQueryService
             r2.InitAlgTree("");
             r3.InitAlgTree("");
             r4.InitAlgTree("");
-            //
-            return sat.GetJSONAlgTree(AlgTreeRoot);
+            string optimized = sat.GetJSONAlgTree(AlgTreeRoot);
+            return new AjaxResult(originTree, optimized).ToString();
         }
         [WebMethod]
         public DataTable GetData(string s)
@@ -88,6 +89,20 @@ namespace DistributedQueryService
             for (int i = 0; i < ("TimeCost(ms):" + info).Length; i++)
                 mkup += "=";
             Console.WriteLine("=============================" + mkup);
+        }
+    }
+    class AjaxResult
+    {
+        string original;
+        string optimized;
+        public AjaxResult(string ori, string opt)
+        {
+            original = ori;
+            optimized = opt;
+        }
+        public string ToString()
+        {
+            return String.Format("{{\"original\":{0},\"optimized\":{1}}}", original, optimized);
         }
     }
     class Sql2AlgTree
@@ -411,7 +426,7 @@ namespace DistributedQueryService
             string json = "";
             if (node.OpType == OpType.LEAF)
             {
-                json = String.Format("{{OpType:\"{0}\",TabName:\"{1}\"}}", node.OpType, node.TabName);
+                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"GUID\":\"{2}\",\"Site\":\"{3}\"}}", node.OpType, node.TabName, node.NodeGuid, node.Site);
             }
             else
             {
@@ -429,8 +444,8 @@ namespace DistributedQueryService
                     }
                     oprands += GetJSONAlgTree(op);
                 }
-                json = String.Format("{{OpType:\"{0}\",TabName:\"{1}\",Condition:\"{2}\",Site:\"{3}\",Oprands:[{4}]}}",
-                    node.OpType, node.TabName, node.Condition, node.Site, oprands);
+                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"Condition\":\"{2}\",\"Site\":\"{3}\",\"Oprands\":[{4}],\"GUID\":\"{5}\"}}",
+                    node.OpType, node.TabName, node.Condition, node.Site, oprands, node.NodeGuid);
             }
             return json;
         }
