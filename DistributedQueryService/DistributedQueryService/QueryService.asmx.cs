@@ -50,8 +50,8 @@ namespace DistributedQueryService
             Node AlgTreeRoot = sat.GetAlgTree();//generate alg tree
             sat.ReplaceLeafWithSiteInfo(AlgTreeRoot);//replace leaf node with site info
             sat.AlgTreeOpt(AlgTreeRoot);//optimize alg tree, do SEL and PROJ as early as possible
-            sat.GetPlainAlgTree(AlgTreeRoot);
-            return sat.GetPlainAlgTree(AlgTreeRoot);            
+            // return sat.GetPlainAlgTree(AlgTreeRoot);       
+            return sat.GetJSONAlgTree(AlgTreeRoot);
         }
         [WebMethod]
         public DataTable GetData(string s)
@@ -390,7 +390,35 @@ namespace DistributedQueryService
                     plainText+=GetPlainAlgTree(oprand);
             }
             return plainText;
-        }     
+        }
+        public string GetJSONAlgTree(Node node)
+        {
+            string json = "";
+            if (node.OpType == OpType.LEAF)
+            {
+                json = String.Format("{{OpType:\"{0}\",TabName:\"{1}\"}}", node.OpType, node.TabName);
+            }
+            else
+            {
+                string oprands = "";
+                bool first = true;
+                foreach (Node op in node.Oprands)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        oprands += ",";
+                    }
+                    oprands += GetJSONAlgTree(op);
+                }
+                json = String.Format("{{OpType:\"{0}\",TabName:\"{1}\",Condition:\"{2}\",Site:\"{3}\",Oprands:[{4}]}}",
+                    node.OpType, node.TabName, node.Condition, node.Site, oprands);
+            }
+            return json;
+        }
         public string ExportNode(Node node)
         {
             string SQL = "";
@@ -421,7 +449,11 @@ namespace DistributedQueryService
             //1. SEL opt
             List<Node> SelNodes = new List<Node>();
             SelOptimize(rootNode, SelNodes);//collect SEL nodes and delete them from alg tree
+<<<<<<< HEAD
             //2. PROJ opt
+=======
+
+>>>>>>> c0b7e2a3aadb52df898f48bd3e92c902a2502eda
             ProjOptimize(rootNode);
         }
         private void ProjOptimize(Node node)
@@ -466,14 +498,15 @@ namespace DistributedQueryService
                     }
                 }
                 foreach (Node op in node.Oprands)
-                {   
-                    foreach (Node child in op.Oprands)
+                {
+                    List<Node> cloned = new List<Node>(op.Oprands);
+                    op.Oprands.Clear();
+                    foreach (Node child in cloned)
                     {
                         Node newNode = new Node();
                         newNode.OpType = OpType.PROJ;
                         newNode.Condition = condition;
                         newNode.Oprands.Add(child);
-                        op.Oprands.Remove(child);
                         op.Oprands.Add(newNode);
                     }
                 }
