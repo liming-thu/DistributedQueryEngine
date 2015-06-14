@@ -481,6 +481,35 @@ namespace DistributedQueryService
             SelOptimize(rootNode, SelNodes);//collect SEL nodes and delete them from alg tree
             //2. PROJ opt
             ProjOptimize(rootNode);
+            //3. Set branches' site info
+            SetSiteInfo(rootNode);
+        }
+        private void SetSiteInfo(Node node)
+        {
+            if (node.Site == 0)
+                node.Site = GetSiteFromOprands(node);
+        }
+        private int GetRndSite(int cnt)
+        {
+            Random rnd = new Random();
+            return rnd.Next(cnt);
+        }
+        private int GetSiteFromOprands(Node node)
+        {
+            foreach (var oprand in node.Oprands)
+            {
+                if (oprand.Site == 0)
+                    oprand.Site = GetSiteFromOprands(oprand);
+            }
+            if (node.Oprands.Count > 0)
+            {
+                if (node.Oprands[0].TabName != "")
+                    return node.Oprands[0].Site;
+                else
+                    return node.Oprands[GetRndSite(node.Oprands.Count)].Site;
+            }
+            else
+                return node.Site;
         }
         private void ProjOptimize(Node node)
         {
