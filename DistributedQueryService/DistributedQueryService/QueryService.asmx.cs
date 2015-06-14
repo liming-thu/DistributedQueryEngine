@@ -416,7 +416,72 @@ namespace DistributedQueryService
         }
         private void ProjOptimize(Node node)
         {
-
+            if (node.OpType == OpType.LEAF) return;
+            if (node.OpType == OpType.PROJ) // Optimize the project node
+            {
+                Regex pattern = new Regex(@"\w+\.");
+                string condition = pattern.Replace(node.Condition, "");
+                List<string> addition = new List<string>();
+                foreach (Node op in node.Oprands)
+                {
+                    string cond = pattern.Replace(op.Condition, "");
+                    if (op.OpType == OpType.SEL)
+                    {
+                        Regex patternAnd = new Regex(@" \band\b ");
+                        cond = pattern.Replace(cond, ",");
+                    }
+                    string[] conds;
+                    switch (op.OpType)
+                    {
+                        case OpType.JOIN:
+                            conds = cond.Split('=');
+                            break;
+                        case OpType.SEL:
+                            conds = cond.Split(',');
+                            break;
+                        default:
+                            conds = new string[0];
+                            break;
+                    }
+                    foreach (string str in conds)
+                    {
+                        addition.Add(str);
+                    }
+                }
+                foreach (string str in addition)
+                {
+                    if (condition.IndexOf(str) < 0)
+                    {
+                        condition = condition + "," + str;
+                    }
+                }
+                foreach (Node op in node.Oprands)
+                {   
+                    foreach (Node child in op.Oprands)
+                    {
+                        Node newNode = new Node();
+                        newNode.OpType = OpType.PROJ;
+                        newNode.Condition = condition;
+                        newNode.Oprands.Add(child);
+                        op.Oprands.Remove(child);
+                        op.Oprands.Add(newNode);
+                    }
+                }
+                foreach (Node op in node.Oprands)
+                {
+                    ProjOptimize(op);
+                }
+            }
+            else // Iterate child to find another project node
+            {
+                if (node.Oprands != null)
+                {
+                    foreach (Node op in node.Oprands)
+                    {
+                        ProjOptimize(op);
+                    }
+                }
+            }
         }
         private void SelOptimize(Node node,List<Node> SelNodes)
         {
