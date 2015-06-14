@@ -3,8 +3,15 @@ C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\b
 C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.dll
 C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.pdb
 C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.csprojResolveAssemblyReference.cache
+<<<<<<< HEAD
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.csprojResolveAssemblyReference.cache
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.dll
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.pdb
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\bin\DistributedQueryService.dll
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\bin\DistributedQueryService.pdb
+=======
+C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\bin\DistributedQueryService.dll
+C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\bin\DistributedQueryService.pdb
+C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.dll
+C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.pdb
+>>>>>>> 46f1fd2a837f80e70a1ae7fc0b0deaee604b64e0

@@ -31,9 +31,9 @@ namespace DistributedQueryService
         public string Sql2AlgTree(string sql)
         {
             Sql2AlgTree sat = new Sql2AlgTree(sql);
-            Node AlgTreeRoot = sat.GetAlgTree();
-            //
-            sat.ReplaceLeafWithSiteInfo(AlgTreeRoot);
+            Node AlgTreeRoot = sat.GetAlgTree();//generate alg tree
+            sat.ReplaceLeafWithSiteInfo(AlgTreeRoot);//replace leaf node with site info
+            sat.AlgTreeOpt(AlgTreeRoot);//optimize alg tree, do SEL and PROJ as early as possible
             sat.GetPlainAlgTree(AlgTreeRoot);
             return sat.GetPlainAlgTree(AlgTreeRoot);            
         }
@@ -216,8 +216,10 @@ namespace DistributedQueryService
                     rootNode.Site = 0;
                     foreach (var expr in Fields)
                     {
-                        rootNode.Condition += expr + " ";
+                        rootNode.Condition += expr + ",";
                     }
+                    if (rootNode.Condition.Length > 0)
+                        rootNode.Condition = rootNode.Condition.Substring(0, rootNode.Condition.Length - 1);
                     curNode = rootNode;
                 }
                 else
@@ -226,8 +228,10 @@ namespace DistributedQueryService
                     curNode.Site = 0;
                     foreach (var expr in Fields)
                     {
-                        curNode.Condition += expr + " ";
+                        curNode.Condition += expr + ",";
                     }
+                    if (curNode.Condition.Length > 0)
+                        curNode.Condition = curNode.Condition.Substring(0, curNode.Condition.Length - 1);
                     foreach (var tab in Tabs)
                     {
                         curNode.TabName+=tab+",";
@@ -378,8 +382,7 @@ namespace DistributedQueryService
                     plainText+=GetPlainAlgTree(oprand);
             }
             return plainText;
-        }
-        
+        }     
         public string ExportNode(Node node)
         {
             string SQL = "";
@@ -404,6 +407,37 @@ namespace DistributedQueryService
             }
             //Console.WriteLine("SQL:" + SQL);
             return (String.Format("{0}-Condition:{1},OprandsCount:{2},TabName:{3},Site:{4}", node.OpType, node.Condition, node.Oprands.Count(), node.TabName, node.Site));
+        }
+        public void AlgTreeOpt(Node rootNode)
+        {
+            //1. SEL opt
+            List<Node> SelNodes = new List<Node>();
+            CollectSelNodes(rootNode, SelNodes);//collect SEL nodes and delete them from alg tree
+        }
+        private void CollectSelNodes(Node node,List<Node> SelNodes)
+        {
+            if (node.Oprands!=null)
+            {
+                for (int i=0;i<node.Oprands.Count;i++)
+                {
+                    Node oprand=node.Oprands[i];
+                    if (oprand.OpType == OpType.SEL)
+                    {
+                        SelNodes.Add(oprand);//
+                        node.Oprands[i] = oprand.Oprands[0];//skip the SEL node
+                        oprand.Oprands.Clear();//clear the oprands
+                        CollectSelNodes(node, SelNodes);
+                    }
+                    else if(oprand.OpType!=OpType.LEAF)
+                    {
+                        CollectSelNodes(oprand, SelNodes);
+                    }
+                    else if (oprand.OpType == OpType.LEAF)
+                    {
+ 
+                    }
+                }
+            }
         }
     }
     //
