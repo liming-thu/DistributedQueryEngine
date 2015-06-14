@@ -5,3 +5,5 @@ E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQu
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.csprojResolveAssemblyReference.cache
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.dll
 E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.pdb
+E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\bin\Newtonsoft.Json.pdb
+E:\Home\Programming\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\bin\Newtonsoft.Json.xml
