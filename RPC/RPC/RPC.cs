@@ -31,6 +31,29 @@ namespace RPC
         TODO,
         WAIT
     }
+    public class rpcs
+    {
+        public rpcs()
+        {
+            List<Node> Sites = new List<Node>(4);
+            TcpClientChannel cc1 = new TcpClientChannel("cc1", null);
+            ChannelServices.RegisterChannel(cc1, false);
+            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8001/RPC");
+            //
+            TcpClientChannel cc2 = new TcpClientChannel("cc2", null);
+            ChannelServices.RegisterChannel(cc2, false);
+            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8002/RPC");
+            //
+            TcpClientChannel cc3 = new TcpClientChannel("cc3", null);
+            ChannelServices.RegisterChannel(cc3, false);
+            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8003/RPC");
+            //
+            TcpClientChannel cc4 = new TcpClientChannel("cc4", null);
+            ChannelServices.RegisterChannel(cc4, false);
+            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8004/RPC");
+        }
+
+    }
     public class Node : System.MarshalByRefObject
     {
         /// <summary>
@@ -59,7 +82,6 @@ namespace RPC
         public DataTable TmpDt;//
         public System.Guid NodeGuid;
         public NodeStatus Status;
-        public List<Node> Sites;
         public Node()
         {
             Oprands = new List<Node>();
@@ -70,23 +92,7 @@ namespace RPC
             TmpDt = new DataTable();
             NodeGuid = System.Guid.NewGuid();
             Status = NodeStatus.WAIT;
-            //
-            Sites = new List<Node>(4);
-            TcpClientChannel cc1 = new TcpClientChannel("cc1", null);
-            ChannelServices.RegisterChannel(cc1, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8001/RPC");
-            //
-            TcpClientChannel cc2 = new TcpClientChannel("cc2", null);
-            ChannelServices.RegisterChannel(cc2, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8002/RPC");
-            //
-            TcpClientChannel cc3 = new TcpClientChannel("cc3", null);
-            ChannelServices.RegisterChannel(cc3, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8003/RPC");
-            //
-            TcpClientChannel cc4 = new TcpClientChannel("cc4", null);
-            ChannelServices.RegisterChannel(cc4, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8004/RPC");
+            //   
         }
         public void Execute()
         {
