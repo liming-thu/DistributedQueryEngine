@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedQueryService", "DistributedQueryService\DistributedQueryService.csproj", "{671760EC-C768-4C2C-A920-638869801D16}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPC", "..\RPC\RPC\RPC.csproj", "{6D8C54E2-A0B7-4BAB-964B-634E262E33A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteRpcServer", "..\SiteRpcServer\SiteRpcServer\SiteRpcServer.csproj", "{0EBDDC75-10B0-4A46-87A5-5438E4EA47DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +17,14 @@ Global
 		{671760EC-C768-4C2C-A920-638869801D16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{671760EC-C768-4C2C-A920-638869801D16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{671760EC-C768-4C2C-A920-638869801D16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D8C54E2-A0B7-4BAB-964B-634E262E33A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D8C54E2-A0B7-4BAB-964B-634E262E33A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D8C54E2-A0B7-4BAB-964B-634E262E33A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D8C54E2-A0B7-4BAB-964B-634E262E33A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EBDDC75-10B0-4A46-87A5-5438E4EA47DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EBDDC75-10B0-4A46-87A5-5438E4EA47DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EBDDC75-10B0-4A46-87A5-5438E4EA47DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EBDDC75-10B0-4A46-87A5-5438E4EA47DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -500,7 +500,13 @@ namespace DistributedQueryService
         LEAF,
         NIL
     }
-    public class Node
+    public enum NodeStatus
+    {
+        DONE,
+        TODO,
+        WAIT
+    }
+    public class Node : System.MarshalByRefObject
     {
         /// <summary>
         /// JOIN,SEL,PROJ,UNION,LEAF之一
@@ -526,6 +532,8 @@ namespace DistributedQueryService
         /// 临时数据
         /// </summary>
         public DataTable TmpDt;//
+        public System.Guid NodeGuid;
+        public NodeStatus Status;
         public Node()
         {
             Oprands = new List<Node>();
@@ -534,6 +542,8 @@ namespace DistributedQueryService
             Site = 0;
             TabName = "";
             TmpDt = new DataTable();
+            NodeGuid = System.Guid.NewGuid();
+            Status = NodeStatus.WAIT;
         }
         public void Execute() {
             // Execute oprands first
