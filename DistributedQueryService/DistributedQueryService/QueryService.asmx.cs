@@ -67,7 +67,22 @@ namespace DistributedQueryService
             r2.InitAlgTree(optimized);
             r3.InitAlgTree(optimized);
             r4.InitAlgTree(optimized);
-            
+            //
+            DataTable dt = new DataTable();
+            dt.TableName = "aaa";
+            switch (AlgTreeRoot.Site)
+            {
+                case 1:
+                    dt = r1.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
+                case 2:
+                    dt = r2.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
+                case 3:
+                    dt = r3.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
+                case 4:
+                    dt = r3.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
+                default: break;
+            }
+            //
             return new AjaxResult(originTree, optimized).ToString();
         }
         [WebMethod]
@@ -146,7 +161,7 @@ namespace DistributedQueryService
             if (pOK == 0)//解析成功,开始生成关系代数树
             {
                 string joinedtab = "";
-                Node curNode = new Node();
+                Node curNode = Node.CreateNode();
                 foreach (TLzCustomExpression expr in Exprs)
                 {
                     string tab1 = expr.lexpr.AsText.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
@@ -155,12 +170,12 @@ namespace DistributedQueryService
                         string tab2 = expr.rexpr.AsText.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
                         if (joinedtab.Contains(tab1))
                         {
-                            Node node1 = new Node();
+                            Node node1 = Node.CreateNode();
                             node1.OpType = OpType.LEAF;
                             node1.TabName = tab2;
                             node1.Site = 0;
                             //
-                            Node node2 = new Node();
+                            Node node2 = Node.CreateNode();
                             node2.OpType = OpType.JOIN;
                             node2.Condition = expr.AsText.Replace(" ","");
                             node2.Oprands.Add(curNode);
@@ -170,12 +185,12 @@ namespace DistributedQueryService
                         }
                         else if (joinedtab.Contains(tab2))
                         {
-                            Node node1 = new Node();
+                            Node node1 = Node.CreateNode();
                             node1.OpType = OpType.LEAF;
                             node1.TabName = tab1;
                             node1.Site = 0;
                             //
-                            Node node2 = new Node();
+                            Node node2 = Node.CreateNode();
                             node2.OpType = OpType.JOIN;
                             node2.Condition = expr.AsText.Replace(" ", "");
                             node2.Oprands.Add(curNode);
@@ -188,12 +203,12 @@ namespace DistributedQueryService
                         }
                         else
                         {
-                            Node leftNode = new Node();
+                            Node leftNode = Node.CreateNode();
                             leftNode.OpType = OpType.LEAF;
                             leftNode.TabName = tab1;
                             leftNode.Site = 0;
                             //
-                            Node rightNode = new Node();
+                            Node rightNode = Node.CreateNode();
                             rightNode.OpType = OpType.LEAF;
                             rightNode.TabName = tab2;
                             rightNode.Site = 0;
@@ -208,14 +223,14 @@ namespace DistributedQueryService
                             }
                             else //不为空
                             {
-                                Node joinNode1 = new Node();
+                                Node joinNode1 = Node.CreateNode();
                                 joinNode1.Oprands.Add(leftNode);
                                 joinNode1.Oprands.Add(rightNode);
                                 joinNode1.OpType = OpType.JOIN;
                                 joinNode1.Condition = expr.AsText.Replace(" ", "");
                                 joinNode1.Site = 0;
                                 //
-                                Node joinNode2 = new Node();
+                                Node joinNode2 = Node.CreateNode();
                                 joinNode2.Oprands.Add(curNode);
                                 joinNode2.Oprands.Add(joinNode1);
                                 joinNode2.OpType = OpType.JOIN;
@@ -230,7 +245,7 @@ namespace DistributedQueryService
                     {
                         if (curNode.OpType != OpType.NIL)
                         {
-                            Node node = new Node();
+                            Node node = Node.CreateNode();
                             node.OpType = OpType.SEL;
                             node.Oprands.Add(curNode);
                             node.Condition = expr.AsText.Replace(" ", "");
@@ -249,7 +264,7 @@ namespace DistributedQueryService
                 //Project
                 if (curNode.OpType != OpType.NIL)//有where表达式
                 {
-                    Node rootNode = new Node();
+                    Node rootNode = Node.CreateNode();
                     rootNode.OpType = OpType.PROJ;
                     rootNode.Oprands.Add(curNode);
                     rootNode.Site = 0;
@@ -300,12 +315,12 @@ namespace DistributedQueryService
                 //默认:数据库分片信息已知
                 if (node.TabName.ToLower() == "customer")
                 {
-                    Node node1 = new Node();
+                    Node node1 = Node.CreateNode();
                     node1.OpType = OpType.LEAF;
                     node1.TabName = node.TabName;
                     node1.Site = 1;
                     //
-                    Node node2 = new Node();
+                    Node node2 = Node.CreateNode();
                     node2.OpType = OpType.LEAF;
                     node2.TabName = node.TabName;
                     node2.Site = 2;
@@ -318,22 +333,22 @@ namespace DistributedQueryService
                 }
                 else if (node.TabName.ToLower() == "orders")
                 {
-                    Node node1 = new Node();
+                    Node node1 = Node.CreateNode();
                     node1.OpType = OpType.LEAF;
                     node1.TabName = node.TabName;
                     node1.Site = 1;
                     //
-                    Node node2 = new Node();
+                    Node node2 = Node.CreateNode();
                     node2.OpType = OpType.LEAF;
                     node2.TabName = node.TabName;
                     node2.Site = 2;
                     //
-                    Node node3 = new Node();
+                    Node node3 = Node.CreateNode();
                     node3.OpType = OpType.LEAF;
                     node3.TabName = node.TabName;
                     node3.Site = 3;
                     //
-                    Node node4 = new Node();
+                    Node node4 = Node.CreateNode();
                     node4.OpType = OpType.LEAF;
                     node4.TabName = node.TabName;
                     node4.Site = 4;
@@ -348,22 +363,22 @@ namespace DistributedQueryService
                 }
                 else if (node.TabName.ToLower() == "publisher")
                 {
-                    Node node1 = new Node();
+                    Node node1 = Node.CreateNode();
                     node1.OpType = OpType.LEAF;
                     node1.TabName = node.TabName;
                     node1.Site = 1;
                     //
-                    Node node2 = new Node();
+                    Node node2 = Node.CreateNode();
                     node2.OpType = OpType.LEAF;
                     node2.TabName = node.TabName;
                     node2.Site = 2;
                     //
-                    Node node3 = new Node();
+                    Node node3 = Node.CreateNode();
                     node3.OpType = OpType.LEAF;
                     node3.TabName = node.TabName;
                     node3.Site = 3;
                     //
-                    Node node4 = new Node();
+                    Node node4 = Node.CreateNode();
                     node4.OpType = OpType.LEAF;
                     node4.TabName = node.TabName;
                     node4.Site = 4;
@@ -377,22 +392,22 @@ namespace DistributedQueryService
                 }
                 else//book
                 {
-                    Node node1 = new Node();
+                    Node node1 = Node.CreateNode();
                     node1.OpType = OpType.LEAF;
                     node1.TabName = node.TabName;
                     node1.Site = 1;
                     //
-                    Node node2 = new Node();
+                    Node node2 = Node.CreateNode();
                     node2.OpType = OpType.LEAF;
                     node2.TabName = node.TabName;
                     node2.Site = 2;
                     //
-                    Node node3 = new Node();
+                    Node node3 = Node.CreateNode();
                     node3.OpType = OpType.LEAF;
                     node3.TabName = node.TabName;
                     node3.Site = 3;
                     //
-                    //Node node4 = new Node();
+                    //Node node4 = Node.CreateNode();
                     //node4.OpType = OpType.LEAF;
                     //node4.TabName = node.TabName;
                     //node4.Site = 4;
@@ -427,7 +442,7 @@ namespace DistributedQueryService
             string json = "";
             if (node.OpType == OpType.LEAF)
             {
-                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"GUID\":\"{2}\",\"Site\":\"{3}\"}}", node.OpType, node.TabName, node.NodeGuid, node.Site);
+                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"NodeGuid\":\"{2}\",\"Site\":\"{3}\"}}", node.OpType, node.TabName, node.NodeGuid, node.Site);
             }
             else
             {
@@ -445,7 +460,7 @@ namespace DistributedQueryService
                     }
                     oprands += GetJSONAlgTree(op);
                 }
-                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"Condition\":\"{2}\",\"Site\":\"{3}\",\"Oprands\":[{4}],\"GUID\":\"{5}\"}}",
+                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"Condition\":\"{2}\",\"Site\":\"{3}\",\"Oprands\":[{4}],\"NodeGuid\":\"{5}\"}}",
                     node.OpType, node.TabName, node.Condition, node.Site, oprands, node.NodeGuid);
             }
             return json;
@@ -559,7 +574,7 @@ namespace DistributedQueryService
                     op.Oprands.Clear();
                     foreach (Node child in cloned)
                     {
-                        Node newNode = new Node();
+                        Node newNode = Node.CreateNode();
                         newNode.OpType = OpType.PROJ;
                         newNode.Condition = condition;
                         newNode.Oprands.Add(child);

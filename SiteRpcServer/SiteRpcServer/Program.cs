@@ -17,7 +17,7 @@ namespace SiteRpcServer
         static void Main(string[] args)
         {
             bool inputOK = false;
-            int port = 0;
+            int port = 0;// Convert.ToInt32(args[0]);
             while (inputOK == false)
             {
                 System.Console.WriteLine("Please input site index:(1-4)");

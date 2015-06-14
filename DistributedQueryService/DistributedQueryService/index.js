@@ -27,7 +27,7 @@ $(document).ready(function () {
                 break;
         }
         return new joint.shapes.basic.Rect({
-            id: node.GUID,
+            id: node.NodeGuid,
             size: { width: width, height: height },
             attrs: {
                 text: { text: label, 'font-size': letterSize, 'font-family': 'monospace' },
@@ -43,8 +43,8 @@ $(document).ready(function () {
 
     function makeLink(nodeA, nodeB) {
         return new joint.dia.Link({
-            source: { id: nodeA.GUID },
-            target: { id: nodeB.GUID },
+            source: { id: nodeA.NodeGuid },
+            target: { id: nodeB.NodeGuid },
             attrs: { '.marker-target': { d: 'M 4 0 L 0 2 L 4 4 z' } },
             smooth: true
         });

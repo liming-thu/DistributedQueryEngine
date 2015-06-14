@@ -38,7 +38,7 @@ namespace CommonLib
         
         public int mySite;
         public Node rootNode;
-        Dictionary<Guid, Node> nodeHash = new Dictionary<Guid, Node>();
+        Dictionary<string, Node> nodeHash = new Dictionary<string, Node>();
         public RPC()
         {
             //
@@ -55,7 +55,7 @@ namespace CommonLib
         }
         private void RegisterTree(Node node)
         {
-            nodeHash.Add(node.NodeGuid, node);
+            nodeHash.Add(node.NodeGuid.ToString(), node);
             if (node.OpType != OpType.LEAF)
             {
                 foreach (Node op in node.Oprands)
@@ -66,15 +66,21 @@ namespace CommonLib
         }
         public void InitAlgTree(string jsonNode)
         {
+            Console.WriteLine("InitAlgTree Begin");
             Node root = JsonConvert.DeserializeObject<Node>(jsonNode);
             nodeHash.Clear();
             RegisterTree(root);
+            Console.WriteLine("InitAlgTree Finish");
         }
-        public DataTable RpcExcute(Guid gid)
+        public DataTable RpcExcute(string gid)
         {
+            Console.WriteLine(mySite + "Recv request for node:" + gid.ToString());
+            Console.WriteLine("hash count:"+nodeHash.Count);
+            foreach( var k in nodeHash.Keys)
+                Console.WriteLine(k);
             Node opNode = nodeHash[gid];
             opNode.Execute();
-            Console.WriteLine(mySite + "Recv request for node:" + gid.ToString()+", result size:"+opNode.TmpDt.Rows.Count);
+            Console.WriteLine(mySite + "Recv request for node:" + gid.ToString());
             return opNode.TmpDt;
         }
     }
@@ -106,7 +112,7 @@ namespace CommonLib
         /// 临时数据
         /// </summary>
         public DataTable TmpDt;//
-        public System.Guid NodeGuid;
+        public string NodeGuid;
         public NodeStatus Status;
 
         static public RPC site1;
@@ -133,7 +139,7 @@ namespace CommonLib
                 site4 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8004/RPC");
             }
         }
-       
+
         public Node()
         {
             InitializeRpcClient();
@@ -143,18 +149,36 @@ namespace CommonLib
             Site = 0;
             TabName = "";
             TmpDt = new DataTable();
-            NodeGuid = System.Guid.NewGuid();
+            NodeGuid = System.Guid.NewGuid().ToString();
             Status = NodeStatus.WAIT;
+        }
+       
+        static public Node CreateNode()
+        {
+            InitializeRpcClient();
+            Node node = new Node();
+            node.Oprands = new List<Node>();
+            node.OpType = OpType.NIL;
+            node.Condition = "";
+            node.Site = 0;
+            node.TabName = "";
+            node.TmpDt = new DataTable();
+            node.NodeGuid = System.Guid.NewGuid().ToString();
+            node.Status = NodeStatus.WAIT;
             //   
+            Console.WriteLine("New node:"+node.NodeGuid);
+            return node;
         }
         
         public void Execute()
         {
             // Execute oprands first
+            Console.WriteLine("Execute: " + OpType);
             foreach (Node op in Oprands)
             {
                 if (op.Site != Site)
                 {
+                    Console.WriteLine("Call Remote Execute to site: " + op.Site);
                     op.RemoteExecute();
                 }
                 else
@@ -175,24 +199,26 @@ namespace CommonLib
                     //TODO: Maybe we need to throw an exception here
                     break;
             }
+            Console.WriteLine("Execute: " + OpType + " Finished");
         }
 
         public void RemoteExecute()
         {
+            Console.WriteLine("In remoteExecute for guid: " + NodeGuid);
             //TODO: Use rpc to execute on remote site
             switch (Site)
             {
                 case 1:
-                    TmpDt=site1.RpcExcute(NodeGuid);
+                    TmpDt=site1.RpcExcute(NodeGuid.ToString());
                     break;
                 case 2:
-                    TmpDt=site1.RpcExcute(NodeGuid);
+                    TmpDt=site2.RpcExcute(NodeGuid.ToString());
                     break;
                 case 3:
-                    TmpDt=site1.RpcExcute(NodeGuid);
+                    TmpDt=site3.RpcExcute(NodeGuid.ToString());
                     break;
                 case 4:
-                    TmpDt=site1.RpcExcute(NodeGuid);
+                    TmpDt=site4.RpcExcute(NodeGuid.ToString());
                     break;
                 default: break;
 
@@ -224,6 +250,11 @@ namespace CommonLib
                 fieldA = right[1];
             }
 
+            if (TmpDt == null)
+            {
+                TmpDt = new DataTable();
+            }
+
             var query =
                 from rHead in a.TmpDt.AsEnumerable()
                 join rTail in b.TmpDt.AsEnumerable()
@@ -241,26 +272,54 @@ namespace CommonLib
         {
             MySqlConnection con = new MySqlConnection(String.Format("server={0};user id={1}; password={2}; database={3}; pooling=false", "localhost", "root", "123456", "site"+Site.ToString()));
             MySqlDataAdapter adpt = new MySqlDataAdapter("", con);
-            adpt.SelectCommand.CommandText = "select * from "+TabName+" where "+Condition;
+            
+            string sql = "select * from " + TabName;
+            if (Condition.Length > 0)
+            {
+                sql += " where " + Condition;
+            }
+            Console.WriteLine(sql);
+            adpt.SelectCommand.CommandText = sql;
+            if (TmpDt == null)
+            {
+                TmpDt = new DataTable();
+            }
             adpt.Fill(TmpDt);
+            //Console.WriteLine("doQuery result size:" + TmpDt.Rows.Count);
         }
         private void doUnion()
         {
+            if (TmpDt == null)
+            {
+                TmpDt = new DataTable();
+            }
             foreach (Node op in Oprands)
             {
                 TmpDt.Merge(op.TmpDt);
             }
+            //Console.WriteLine("doUnion result size:" + TmpDt.Rows.Count);
+
         }
         private void doSelect()
         {
+            if (TmpDt == null)
+            {
+                TmpDt = new DataTable();
+            }
             Regex pattern = new Regex(@"\w+\.");
             string condition = pattern.Replace(Condition, "");
             DataTable newDt = new DataTable();
             newDt.Rows.Add(TmpDt.Select(condition));
             TmpDt = newDt;
+            //Console.WriteLine("doSelect result size:" + TmpDt.Rows.Count);
+
         }
         private void doProject()
         {
+            if (TmpDt == null)
+            {
+                TmpDt = new DataTable();
+            }
             Regex pattern = new Regex(@"\w+\.");
             string condition = pattern.Replace(Condition, "");
             foreach (DataColumn col in TmpDt.Columns)
@@ -270,6 +329,8 @@ namespace CommonLib
                     TmpDt.Columns.Remove(col);
                 }
             }
+            //Console.WriteLine("doProject result size:" + TmpDt.Rows.Count);
+
         }
     }
 }
