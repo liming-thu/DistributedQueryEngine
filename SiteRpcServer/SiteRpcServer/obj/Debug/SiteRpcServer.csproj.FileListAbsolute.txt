@@ -14,3 +14,12 @@ E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.csprojResolveAssemblyReference.cache
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.exe
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.pdb
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServer.exe.config
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServer.exe
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServer.pdb
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\RPC.dll
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\RPC.pdb
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.exe
+C:\Users\Administrator\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.pdb

@@ -49,7 +49,7 @@ namespace DistributedQueryService
             r4 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8004/RPC");
         }
         [WebMethod]
-        public DataTable Sql2AlgTree(string sql)
+        public int Sql2AlgTree(string sql)
         {
             Sql2AlgTree sat = new Sql2AlgTree(sql);
             Node AlgTreeRoot = sat.GetAlgTree();//generate alg tree
@@ -62,18 +62,15 @@ namespace DistributedQueryService
             r2.InitSite(2);
             r3.InitSite(3);
             r4.InitSite(4);
-            //
+
             r1.InitAlgTree(optimized);
             r2.InitAlgTree(optimized);
             r3.InitAlgTree(optimized);
             r4.InitAlgTree(optimized);
             //
-            DataTable dt = new DataTable();
-            dt.TableName = "aaa";
-            AlgTreeRoot.FinalExecute();
-            dt = AlgTreeRoot.TmpDt;
-            return dt;
-            /*switch (AlgTreeRoot.Site)
+            DataTable dt = new DataTable();                  
+            //return dt;
+            switch (AlgTreeRoot.Site)
             {
                 case 1:
                     dt = r1.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
@@ -84,7 +81,9 @@ namespace DistributedQueryService
                 case 4:
                     dt = r3.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
                 default: break;
-            }*/
+            }
+            dt.TableName = "aaa";
+            return dt.Rows.Count;
             //
             //return new AjaxResult(originTree, optimized).ToString();
         }
@@ -445,7 +444,7 @@ namespace DistributedQueryService
             string json = "";
             if (node.OpType == OpType.LEAF)
             {
-                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"NodeGuid\":\"{2}\",\"Site\":\"{3}\"}}", node.OpType, node.TabName, node.NodeGuid, node.Site);
+                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"NodeGuid\":\"{2}\",\"Site\":\"{3}\",\"TmpSize\":\"{4}\",\"Condition\":\"{5}\"}}", node.OpType, node.TabName, node.NodeGuid, node.Site, node.TmpSize, node.Condition);
             }
             else
             {
@@ -463,8 +462,8 @@ namespace DistributedQueryService
                     }
                     oprands += GetJSONAlgTree(op);
                 }
-                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"Condition\":\"{2}\",\"Site\":\"{3}\",\"Oprands\":[{4}],\"NodeGuid\":\"{5}\"}}",
-                    node.OpType, node.TabName, node.Condition, node.Site, oprands, node.NodeGuid);
+                json = String.Format("{{\"OpType\":\"{0}\",\"TabName\":\"{1}\",\"Condition\":\"{2}\",\"Site\":\"{3}\",\"Oprands\":[{4}],\"NodeGuid\":\"{5}\",\"TmpSize\":\"{6}\"}}",
+                    node.OpType, node.TabName, node.Condition, node.Site, oprands, node.NodeGuid, node.TmpSize);
             }
             return json;
         }

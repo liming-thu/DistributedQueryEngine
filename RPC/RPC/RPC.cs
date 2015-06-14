@@ -75,12 +75,8 @@ namespace CommonLib
         public DataTable RpcExcute(string gid)
         {
             Console.WriteLine(mySite + "Recv request for node:" + gid.ToString());
-            Console.WriteLine("hash count:"+nodeHash.Count);
-            foreach( var k in nodeHash.Keys)
-                Console.WriteLine(k);
             Node opNode = nodeHash[gid];
             opNode.Execute();
-            Console.WriteLine(mySite + "Recv request for node:" + gid.ToString());
             return opNode.TmpDt;
         }
     }
@@ -114,6 +110,7 @@ namespace CommonLib
         public DataTable TmpDt;//
         public string NodeGuid;
         public NodeStatus Status;
+        public int TmpSize;
 
         static public RPC site1;
         static public RPC site2;
@@ -189,6 +186,7 @@ namespace CommonLib
                     //TODO: Maybe we need to throw an exception here
                     break;
             }
+            TmpSize = TmpDt.Rows.Count;
             Console.WriteLine("Execute: " + OpType + " Finished");
         }
         
@@ -261,7 +259,7 @@ namespace CommonLib
             string tableB = right[0];
             string fieldA, fieldB;
 
-            if (tableA == a.TabName)
+            if (a.TmpDt.Columns[right[1]] == null)
             {
                 fieldA = left[1];
                 fieldB = right[1];
@@ -282,21 +280,41 @@ namespace CommonLib
                 join rTail in b.TmpDt.AsEnumerable()
                 on rHead.Field<IComparable>(fieldA) equals rTail.Field<IComparable>(fieldB)
                 select rHead.ItemArray.Concat(rTail.ItemArray);
-
+            TmpDt.Columns.Clear();
+            foreach (DataColumn col in a.TmpDt.Columns)
+            {
+                DataColumn newcol = new DataColumn(col.ColumnName, col.DataType);
+                TmpDt.Columns.Add(newcol);
+            }
+            foreach (DataColumn col in b.TmpDt.Columns)
+            {
+                if (TmpDt.Columns[col.ColumnName] == null)
+                {
+                    DataColumn newcol = new DataColumn(col.ColumnName, col.DataType);
+                    TmpDt.Columns.Add(newcol);
+                }
+                else
+                {
+                    DataColumn newcol = new DataColumn("B_"+col.ColumnName, col.DataType);
+                    TmpDt.Columns.Add(newcol);
+                }
+               
+            }
             foreach (var obj in query)
             {
                 DataRow dr = TmpDt.NewRow();
                 dr.ItemArray = obj.ToArray();
                 TmpDt.Rows.Add(dr);
             }
+            Console.WriteLine("doJOIN result size:" + TmpDt.Rows.Count);
         }
         private void doQuery()
         {
             MySqlConnection con = new MySqlConnection(String.Format("server={0};user id={1}; password={2}; database={3}; pooling=false", "localhost", "root", "123456", "site"+Site.ToString()));
             MySqlDataAdapter adpt = new MySqlDataAdapter("", con);
-            
+            Console.WriteLine("Condition:" + Condition);
             string sql = "select * from " + TabName;
-            if (Condition.Length > 0)
+            if (Condition.Trim()!="")
             {
                 sql += " where " + Condition;
             }
@@ -307,7 +325,7 @@ namespace CommonLib
                 TmpDt = new DataTable();
             }
             adpt.Fill(TmpDt);
-            //Console.WriteLine("doQuery result size:" + TmpDt.Rows.Count);
+            Console.WriteLine("doQuery result size:" + TmpDt.Rows.Count);
         }
         private void doUnion()
         {
@@ -319,7 +337,7 @@ namespace CommonLib
             {
                 TmpDt.Merge(op.TmpDt);
             }
-            //Console.WriteLine("doUnion result size:" + TmpDt.Rows.Count);
+            Console.WriteLine("doUnion result size:" + TmpDt.Rows.Count);
 
         }
         private void doSelect()
@@ -333,7 +351,7 @@ namespace CommonLib
             DataTable newDt = new DataTable();
             newDt.Rows.Add(TmpDt.Select(condition));
             TmpDt = newDt;
-            //Console.WriteLine("doSelect result size:" + TmpDt.Rows.Count);
+            Console.WriteLine("doSelect result size:" + TmpDt.Rows.Count);
 
         }
         private void doProject()
@@ -344,14 +362,15 @@ namespace CommonLib
             }
             Regex pattern = new Regex(@"\w+\.");
             string condition = pattern.Replace(Condition, "");
-            foreach (DataColumn col in TmpDt.Columns)
+            TmpDt = Oprands[0].TmpDt.Copy();
+            foreach (DataColumn col in Oprands[0].TmpDt.Columns)
             {
                 if (condition.IndexOf(col.ColumnName) < 0)
                 {
-                    TmpDt.Columns.Remove(col);
+                    TmpDt.Columns.Remove(col.ColumnName);
                 }
             }
-            //Console.WriteLine("doProject result size:" + TmpDt.Rows.Count);
+            Console.WriteLine("doProject result size:" + TmpDt.Rows.Count);
 
         }
     }
