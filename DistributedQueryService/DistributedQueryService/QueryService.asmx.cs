@@ -12,6 +12,7 @@ using System.Runtime;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using System.Text.RegularExpressions;
 using RemoteSample;
 
 namespace DistributedQueryService
@@ -483,6 +484,105 @@ namespace DistributedQueryService
             Site = 0;
             TabName = "";
             TmpDt = new DataTable();
+        }
+        public void Execute() {
+            // Execute oprands first
+            foreach (Node op in Oprands)
+            {
+                if (op.Site != Site)
+                {
+                    op.RemoteExecute();
+                }
+                else
+                {
+                    op.Execute();
+                }
+            }
+
+            // Execute
+            switch (OpType)
+            {
+                case OpType.JOIN: doJoin(); break;
+                case OpType.LEAF: doQuery(); break;
+                case OpType.UNION: doUnion(); break;
+                case OpType.SEL: doSelect(); break;
+                case OpType.PROJ: doProject(); break;
+                default:
+                    //TODO: Maybe we need to throw an exception here
+                    break;
+            }
+        }
+
+        public void RemoteExecute()
+        {
+            //TODO: Use rpc to execute on remote site
+        }
+
+        private void doJoin()
+        {
+            // Do join
+            Node a = Oprands[0];
+            Node b = Oprands[1];
+
+            string[] fields = Condition.Split('=');
+            string[] left = fields[0].Split('.');
+            string[] right = fields[1].Split('.');
+
+            string tableA = left[0];
+            string tableB = right[0];
+            string fieldA, fieldB;
+
+            if (tableA == a.TabName) {
+                fieldA = left[1];
+                fieldB = right[1];
+            }
+            else 
+            {
+                fieldB = left[1];
+                fieldA = right[1];
+            }
+
+            var query =
+                from rHead in a.TmpDt.AsEnumerable()
+                join rTail in b.TmpDt.AsEnumerable()
+                on rHead.Field<IComparable>(fieldA) equals rTail.Field<IComparable>(fieldB)
+                select rHead.ItemArray.Concat(rTail.ItemArray);
+
+            foreach (var obj in query)
+            {
+                DataRow dr = TmpDt.NewRow();
+                dr.ItemArray = obj.ToArray();
+                TmpDt.Rows.Add(dr);
+            }
+        }
+        private void doQuery()
+        {
+        }
+        private void doUnion()
+        {
+            foreach (Node op in Oprands)
+            {
+                TmpDt.Merge(op.TmpDt);
+            }
+        }
+        private void doSelect()
+        {
+            Regex pattern = new Regex(@"\w+\.");
+            string condition = pattern.Replace(Condition, "");
+            DataTable newDt = new DataTable();
+            newDt.Rows.Add(TmpDt.Select(condition));
+            TmpDt = newDt;
+        }
+        private void doProject()
+        {
+            Regex pattern = new Regex(@"\w+\.");
+            string condition = pattern.Replace(Condition, "");
+            foreach(DataColumn col in TmpDt.Columns) {
+                if (condition.IndexOf(col.ColumnName) < 0)
+                {
+                    TmpDt.Columns.Remove(col);
+                }
+            }
         }
     }
 }
