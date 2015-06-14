@@ -112,6 +112,7 @@ $(document).ready(function () {
                 $("p#alg-tree").text();
                 drawTree('alg-tree', tree.original);
                 drawTree('optimized-tree', tree.optimized);
+                $("textarea#sql").text(tree.statistics);
             },
             error: function(req, error) {
                 console.log(req);
