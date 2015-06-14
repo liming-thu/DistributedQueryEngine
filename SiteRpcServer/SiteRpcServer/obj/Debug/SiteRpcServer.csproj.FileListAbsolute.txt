@@ -4,3 +4,6 @@ C:\Users\Administrator\Desktop\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServ
 C:\Users\Administrator\Desktop\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.csprojResolveAssemblyReference.cache
 C:\Users\Administrator\Desktop\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.exe
 C:\Users\Administrator\Desktop\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.pdb
+E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServer.exe.config
+E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.exe
+E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.pdb
