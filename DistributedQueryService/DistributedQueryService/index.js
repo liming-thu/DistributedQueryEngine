@@ -1,18 +1,41 @@
 $(document).ready(function () {
     function makeElement(node) {
+        var label;
+        if (node.OpType === "LEAF") {
+            label = node.TabName;
+            if (node.Site > 0) {
+                 label = label + '_' + node.Site;
+            }
+        } else {
+            var regex = /,/g;
+            var condition = node.Condition.replace(regex, "\n");
+            label = node.OpType + '\n' + condition;
+        }
         var letterSize = 8;
-        var width = 2 * (letterSize * (0.6 * node.OpType.length + 1));
-        var height = 2 * letterSize;
+        var maxLineLength = _.max(label.split('\n'), function (l) { return l.length; }).length;
+        var width = 2 * (letterSize * (0.4 * maxLineLength + 1));
+        var height = 2 * ((label.split('\n').length + 1) * letterSize);
 
+        var color;
+        switch (node.Site) {
+            case '1': color = '#5ff'; break;
+            case '2': color = '#f5f'; break;
+            case '3': color = '#ff5'; break;
+            case '4': color = '#55f'; break;
+            default:
+                color = '#fff';
+                break;
+        }
         return new joint.shapes.basic.Rect({
             id: node.GUID,
             size: { width: width, height: height },
             attrs: {
-                text: { text: node.OpType, 'font-size': letterSize, 'font-family': 'monospace' },
+                text: { text: label, 'font-size': letterSize, 'font-family': 'monospace' },
                 rect: {
                     width: width, height: height,
                     rx: 5, ry: 5,
-                    stroke: '#555'
+                    stroke: '#555',
+                    fill: color
                 }
             }
         });
@@ -31,7 +54,7 @@ $(document).ready(function () {
         node.visited = true;
         var elements = [];
         elements.push(makeElement(node));
-        if (node.Oprands) {
+        if (node.OpType !== "LEAF" && node.Oprands) {
             _.each(node.Oprands, function(oprand) {
                 if (!oprand.visited) {
                     elements = elements.concat(buildElements(oprand));
@@ -46,7 +69,9 @@ $(document).ready(function () {
         if (node.Oprands) {
             _.each(node.Oprands, function (oprand) {
                 links.push(makeLink(node, oprand));
-                links.concat(buildLinks(oprand));
+                if (oprand.OpType !== "LEAF") {
+                    links = links.concat(buildLinks(oprand));
+                }
             });
         }
         return links;
@@ -54,7 +79,7 @@ $(document).ready(function () {
 
     function buildTree(root) {
         var elements = buildElements(root);
-        var links = buildLinks(root);
+        var links = buildLinks(root);  
         return elements.concat(links);
     }
 
@@ -63,7 +88,7 @@ $(document).ready(function () {
 
         var paper = new joint.dia.Paper({
             el: $('p#'+place),
-            width: 1000,
+            width: 2000,
             height:1000,
             model: graph,
             gridSize: 1
@@ -71,6 +96,7 @@ $(document).ready(function () {
 
         var cells = buildTree(tree);
         graph.resetCells(cells);
+        joint.layout.DirectedGraph.layout(graph, { setLinkVertices: false });
     }
 
     $("button#summit").click(function(){
@@ -82,9 +108,10 @@ $(document).ready(function () {
             dataType: 'xml',
             success: function(result) {
                 var data = $(result).find("string").text();
-               // var tree = JSON.parse(data);
-                //drawTree('alg-tree', tree);
-                $("p#alg-tree").text(data);
+                var tree = JSON.parse(data);
+                $("p#alg-tree").text();
+                drawTree('alg-tree', tree.original);
+                drawTree('optimized-tree', tree.optimized);
             },
             error: function(req, error) {
                 console.log(req);

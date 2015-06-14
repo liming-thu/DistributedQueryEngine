@@ -12,8 +12,7 @@
     <title>Distributed Query Engine</title>
 </head>
 <body>
-<p><textarea id="sql" rows="12" cols="60" style="resize: none">
-    </textarea><br>
+<p><textarea id="sql" rows="12" cols="60" style="resize: none"></textarea><br>
     <button id="summit">查询</button></p>
 <p id="alg-tree"></p>
 <p id="optimized-tree"></p>
