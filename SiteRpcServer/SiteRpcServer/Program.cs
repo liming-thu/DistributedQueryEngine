@@ -16,13 +16,14 @@ namespace SiteRpcServer
         static void Main(string[] args)
         {
             bool inputOK = false;
+            int port = 0;
             while (inputOK == false)
             {
                 System.Console.WriteLine("Please input site index:(1-4)");
                 string index = System.Console.ReadLine();
                 try
                 {
-                    int port = Convert.ToInt32(index) + 8000;
+                    port = Convert.ToInt32(index) + 8000;
                     if(port<=8004&&port>=8001)
                         inputOK = true;
                 }
@@ -32,10 +33,10 @@ namespace SiteRpcServer
                 }
             }
             //
-            TcpServerChannel channel = new TcpServerChannel(8001);
+            TcpServerChannel channel = new TcpServerChannel(port);
             ChannelServices.RegisterChannel(channel,false);
             RemotingConfiguration.RegisterWellKnownServiceType(typeof(Node),
-                "Node", WellKnownObjectMode.SingleCall);
+                "RPC", WellKnownObjectMode.SingleCall);
             Console.WriteLine("Service Started...");
             //
             string str="";
