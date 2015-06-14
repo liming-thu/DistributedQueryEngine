@@ -1,0 +1,5 @@
+C:\Users\Administrator\Desktop\RPC\RPC\bin\Debug\RPC.dll.config
+C:\Users\Administrator\Desktop\RPC\RPC\bin\Debug\RPC.dll
+C:\Users\Administrator\Desktop\RPC\RPC\bin\Debug\RPC.pdb
+C:\Users\Administrator\Desktop\RPC\RPC\obj\Debug\RPC.dll
+C:\Users\Administrator\Desktop\RPC\RPC\obj\Debug\RPC.pdb

@@ -1,0 +1,5 @@
+C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\bin\DistributedQueryService.dll
+C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\bin\DistributedQueryService.pdb
+C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.dll
+C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.pdb
+C:\Users\Administrator\Desktop\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.csprojResolveAssemblyReference.cache
