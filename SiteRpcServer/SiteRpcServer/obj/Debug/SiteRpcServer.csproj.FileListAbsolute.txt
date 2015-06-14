@@ -5,14 +5,12 @@ C:\Users\Administrator\Desktop\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServ
 C:\Users\Administrator\Desktop\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.exe
 C:\Users\Administrator\Desktop\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.pdb
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServer.exe.config
-E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.exe
-E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.pdb
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServer.exe
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\SiteRpcServer.pdb
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\RPC.dll
+E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\Newtonsoft.Json.dll
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\MySql.Data.dll
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\RPC.pdb
 E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.csprojResolveAssemblyReference.cache
-E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\Newtonsoft.Json.dll
-E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\Newtonsoft.Json.pdb
-E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\bin\Debug\Newtonsoft.Json.xml
+E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.exe
+E:\Home\Programming\DistributedQueryEngine\SiteRpcServer\SiteRpcServer\obj\Debug\SiteRpcServer.pdb

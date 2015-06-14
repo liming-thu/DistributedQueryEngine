@@ -49,7 +49,7 @@ namespace DistributedQueryService
             r4 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8004/RPC");
         }
         [WebMethod]
-        public string Sql2AlgTree(string sql)
+        public DataTable Sql2AlgTree(string sql)
         {
             Sql2AlgTree sat = new Sql2AlgTree(sql);
             Node AlgTreeRoot = sat.GetAlgTree();//generate alg tree
@@ -70,7 +70,10 @@ namespace DistributedQueryService
             //
             DataTable dt = new DataTable();
             dt.TableName = "aaa";
-            switch (AlgTreeRoot.Site)
+            AlgTreeRoot.FinalExecute();
+            dt = AlgTreeRoot.TmpDt;
+            return dt;
+            /*switch (AlgTreeRoot.Site)
             {
                 case 1:
                     dt = r1.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
@@ -81,9 +84,9 @@ namespace DistributedQueryService
                 case 4:
                     dt = r3.RpcExcute(AlgTreeRoot.NodeGuid.ToString()); break;
                 default: break;
-            }
+            }*/
             //
-            return new AjaxResult(originTree, optimized).ToString();
+            //return new AjaxResult(originTree, optimized).ToString();
         }
         [WebMethod]
         public DataTable GetData(string s)

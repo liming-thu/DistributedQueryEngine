@@ -169,6 +169,28 @@ namespace CommonLib
             Console.WriteLine("New node:"+node.NodeGuid);
             return node;
         }
+
+        public void FinalExecute()
+        {
+            foreach (Node op in Oprands)
+            {
+                op.FinalExecute();
+            }
+
+            // Execute
+            switch (OpType)
+            {
+                case OpType.JOIN: doJoin(); break;
+                case OpType.LEAF: doQuery(); break;
+                case OpType.UNION: doUnion(); break;
+                case OpType.SEL: doSelect(); break;
+                case OpType.PROJ: doProject(); break;
+                default:
+                    //TODO: Maybe we need to throw an exception here
+                    break;
+            }
+            Console.WriteLine("Execute: " + OpType + " Finished");
+        }
         
         public void Execute()
         {
