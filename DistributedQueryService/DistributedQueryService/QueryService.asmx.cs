@@ -406,8 +406,8 @@ namespace DistributedQueryService
                     }
                     oprands += GetJSONAlgTree(op);
                 }
-                json = String.Format("{{OpType:\"{0}\",TabName:\"{1}\",Condition:\"{2}\",Site:\"{3}\",Oprands:[{4}]}}",
-                    node.OpType, node.TabName, node.Condition, node.Site, oprands);
+                json = String.Format("{{OpType:\"{0}\",TabName:\"{1}\",Condition:\"{2}\",Site:\"{3}\",Oprands:[{4}],GUID:\"{5}\"}}",
+                    node.OpType, node.TabName, node.Condition, node.Site, oprands, node.NodeGuid);
             }
             return json;
         }
