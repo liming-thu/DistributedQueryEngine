@@ -2,4 +2,3 @@ C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\Distribute
 C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\bin\DistributedQueryService.pdb
 C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.dll
 C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.pdb
-C:\Users\Administrator\DistributedQueryEngine\DistributedQueryService\DistributedQueryService\obj\Debug\DistributedQueryService.csprojResolveAssemblyReference.cache

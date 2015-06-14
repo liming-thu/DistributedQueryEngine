@@ -7,7 +7,7 @@ using System.Runtime;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
-using RemoteSample;
+using RPC;
 
 namespace SiteRpcServer
 {
@@ -34,8 +34,8 @@ namespace SiteRpcServer
             //
             TcpServerChannel channel = new TcpServerChannel(8001);
             ChannelServices.RegisterChannel(channel,false);
-            RemotingConfiguration.RegisterWellKnownServiceType(typeof(RemoteObject),
-                "RemoteObject", WellKnownObjectMode.SingleCall);
+            RemotingConfiguration.RegisterWellKnownServiceType(typeof(Node),
+                "Node", WellKnownObjectMode.SingleCall);
             Console.WriteLine("Service Started...");
             //
             string str="";

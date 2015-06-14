@@ -28,6 +28,22 @@ namespace DistributedQueryService
     public class QueryService : System.Web.Services.WebService
     {
         [WebMethod]
+        public string StartRpcServer(int port)
+        {
+            TcpServerChannel channel = new TcpServerChannel(port);
+            ChannelServices.RegisterChannel(channel, false);
+            RemotingConfiguration.RegisterWellKnownServiceType(typeof(Node), "Node", WellKnownObjectMode.Singleton);
+            return "Service Started...";
+        }
+        [WebMethod]
+        public string TestRpcServer()
+        {
+            TcpClientChannel cc = new TcpClientChannel();
+            ChannelServices.RegisterChannel(cc, false);
+            Node remoteobj = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8001/Node");
+            return remoteobj.RemoteExecute();
+        }
+        [WebMethod]
         public string Sql2AlgTree(string sql)
         {
             Sql2AlgTree sat = new Sql2AlgTree(sql);
@@ -36,14 +52,6 @@ namespace DistributedQueryService
             sat.AlgTreeOpt(AlgTreeRoot);//optimize alg tree, do SEL and PROJ as early as possible
             sat.GetPlainAlgTree(AlgTreeRoot);
             return sat.GetPlainAlgTree(AlgTreeRoot);            
-        }
-        [WebMethod]
-        public string RemoteCall()
-        {
-            ChannelServices.RegisterChannel(new TcpClientChannel(), false);
-            RemoteObject remoteobj = (RemoteObject)Activator.GetObject(typeof(RemoteObject),
-            "tcp://localhost:8001/RemoteObject");
-            return "1 + 2 = " + remoteobj.sum(1, 2).ToString();
         }
         [WebMethod]
         public DataTable GetData(string s)
@@ -413,6 +421,8 @@ namespace DistributedQueryService
             //1. SEL opt
             List<Node> SelNodes = new List<Node>();
             SelOptimize(rootNode, SelNodes);//collect SEL nodes and delete them from alg tree
+            //2. PROJ opt
+            ProjOptimize(rootNode);
         }
         private void ProjOptimize(Node node)
         {
@@ -638,9 +648,10 @@ namespace DistributedQueryService
             }
         }
 
-        public void RemoteExecute()
+        public string RemoteExecute()
         {
             //TODO: Use rpc to execute on remote site
+            return "RPC call ok";
         }
 
         private void doJoin()

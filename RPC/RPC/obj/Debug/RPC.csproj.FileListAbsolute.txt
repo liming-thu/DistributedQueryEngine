@@ -6,6 +6,6 @@ C:\Users\Administrator\Desktop\RPC\RPC\obj\Debug\RPC.pdb
 C:\Users\Administrator\DistributedQueryEngine\RPC\RPC\bin\Debug\RPC.dll.config
 C:\Users\Administrator\DistributedQueryEngine\RPC\RPC\bin\Debug\RPC.dll
 C:\Users\Administrator\DistributedQueryEngine\RPC\RPC\bin\Debug\RPC.pdb
-C:\Users\Administrator\DistributedQueryEngine\RPC\RPC\obj\Debug\RPC.csprojResolveAssemblyReference.cache
 C:\Users\Administrator\DistributedQueryEngine\RPC\RPC\obj\Debug\RPC.dll
 C:\Users\Administrator\DistributedQueryEngine\RPC\RPC\obj\Debug\RPC.pdb
+C:\Users\Administrator\DistributedQueryEngine\RPC\RPC\bin\Debug\gudusoft.gsqlparser.dll
