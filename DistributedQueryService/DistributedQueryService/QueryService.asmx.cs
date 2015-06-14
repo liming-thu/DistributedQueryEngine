@@ -411,9 +411,13 @@ namespace DistributedQueryService
         {
             //1. SEL opt
             List<Node> SelNodes = new List<Node>();
-            CollectSelNodes(rootNode, SelNodes);//collect SEL nodes and delete them from alg tree
+            SelOptimize(rootNode, SelNodes);//collect SEL nodes and delete them from alg tree
         }
-        private void CollectSelNodes(Node node,List<Node> SelNodes)
+        private void ProjOptimize(Node node)
+        {
+
+        }
+        private void SelOptimize(Node node,List<Node> SelNodes)
         {
             if (node.Oprands!=null)
             {
@@ -425,15 +429,27 @@ namespace DistributedQueryService
                         SelNodes.Add(oprand);//
                         node.Oprands[i] = oprand.Oprands[0];//skip the SEL node
                         oprand.Oprands.Clear();//clear the oprands
-                        CollectSelNodes(node, SelNodes);
+                        SelOptimize(node, SelNodes);
                     }
                     else if(oprand.OpType!=OpType.LEAF)
                     {
-                        CollectSelNodes(oprand, SelNodes);
+                        SelOptimize(oprand, SelNodes);
                     }
                     else if (oprand.OpType == OpType.LEAF)
                     {
- 
+                        foreach (var sel in SelNodes)
+                        {
+                            if(sel.Condition.ToLower().Contains(oprand.TabName.ToLower()))
+                            {
+                                if (oprand.Site == 1 && oprand.TabName.ToLower() == "customer" && sel.Condition.Contains("rank"))
+                                    continue;
+                                if (oprand.Site == 2 && oprand.TabName.ToLower() == "customer" && sel.Condition.Contains("name"))
+                                    continue;
+                                oprand.Condition+=sel.Condition+" and ";
+                            }
+                        }
+                        if(oprand.Condition.EndsWith(" and "))
+                            oprand.Condition = oprand.Condition.Substring(0, oprand.Condition.Length - 5);
                     }
                 }
             }
