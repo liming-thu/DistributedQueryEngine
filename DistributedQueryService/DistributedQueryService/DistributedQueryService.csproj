@@ -89,9 +89,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\RPC\RPC\RPC.csproj">
+    <ProjectReference Include="..\..\RPC\RPC\CommonLib.csproj">
       <Project>{6d8c54e2-a0b7-4bab-964b-634e262e33a8}</Project>
-      <Name>RPC</Name>
+      <Name>CommonLib</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

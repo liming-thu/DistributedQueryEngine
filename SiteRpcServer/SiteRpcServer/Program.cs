@@ -7,7 +7,8 @@ using System.Runtime;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
-using RPC;
+using CommonLib;
+using System.Collections;
 
 namespace SiteRpcServer
 {
@@ -33,10 +34,12 @@ namespace SiteRpcServer
                 }
             }
             //
+            
             TcpServerChannel channel = new TcpServerChannel(port);
-            ChannelServices.RegisterChannel(channel,false);
-            RemotingConfiguration.RegisterWellKnownServiceType(typeof(Node),
-                "RPC", WellKnownObjectMode.SingleCall);
+            channel.IsSecured = true;
+            ChannelServices.RegisterChannel(channel,true);
+            RemotingConfiguration.RegisterWellKnownServiceType(typeof(RPC),
+                "RPC", WellKnownObjectMode.Singleton);
             Console.WriteLine("Service Started...");
             //
             string str="";

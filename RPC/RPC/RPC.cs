@@ -13,7 +13,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text.RegularExpressions;
 
-namespace RPC
+namespace CommonLib 
 {
 
     public enum OpType
@@ -31,29 +31,41 @@ namespace RPC
         TODO,
         WAIT
     }
-    public class rpcs
+    [Serializable()]
+    public class RPC : System.MarshalByRefObject
     {
-        public rpcs()
+        
+        public int mySite;
+        public Node rootNode;
+        Dictionary<Guid, Node> nodeHash = new Dictionary<Guid, Node>();
+        public RPC()
         {
-            List<Node> Sites = new List<Node>(4);
-            TcpClientChannel cc1 = new TcpClientChannel("cc1", null);
-            ChannelServices.RegisterChannel(cc1, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8001/RPC");
             //
-            TcpClientChannel cc2 = new TcpClientChannel("cc2", null);
-            ChannelServices.RegisterChannel(cc2, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8002/RPC");
+            mySite = 0;//
+            Console.WriteLine("Create site" + mySite);
             //
-            TcpClientChannel cc3 = new TcpClientChannel("cc3", null);
-            ChannelServices.RegisterChannel(cc3, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8003/RPC");
-            //
-            TcpClientChannel cc4 = new TcpClientChannel("cc4", null);
-            ChannelServices.RegisterChannel(cc4, false);
-            Sites[0] = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8004/RPC");
+            
         }
-
+        public string InitSite(int i)
+        {
+            mySite=i;
+            Console.WriteLine("Init OK," + mySite.ToString());
+            return "Init OK,"+mySite.ToString();
+        }
+        public void InitAlgTree(string jsonNode)
+        {
+            
+        }
+        public DataTable RpcExcute(Guid gid)
+        {
+            Node opNode = nodeHash[gid];
+            opNode.Execute();
+            Console.WriteLine(mySite + "Recv request for node:" + gid.ToString()+", result size:"+opNode.TmpDt.Rows.Count);
+            return opNode.TmpDt;
+        }
     }
+    //[PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+    [Serializable()]
     public class Node : System.MarshalByRefObject
     {
         /// <summary>
@@ -82,8 +94,35 @@ namespace RPC
         public DataTable TmpDt;//
         public System.Guid NodeGuid;
         public NodeStatus Status;
+
+        static public RPC site1;
+        static public RPC site2;
+        static public RPC site3;
+        static public RPC site4;
+        static bool RpcInitialized = false;
+
+        static public void InitializeRpcClient()
+        {
+            if (!RpcInitialized)
+            {
+                RpcInitialized = true;
+                ChannelServices.RegisterChannel(new TcpClientChannel("cc1", null), true);
+                site1 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8001/RPC");
+
+                ChannelServices.RegisterChannel(new TcpClientChannel("cc2", null), true);
+                site2 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8002/RPC");
+
+                ChannelServices.RegisterChannel(new TcpClientChannel("cc3", null), true);
+                site3 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8003/RPC");
+
+                ChannelServices.RegisterChannel(new TcpClientChannel("cc4", null), true);
+                site4 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8004/RPC");
+            }
+        }
+       
         public Node()
         {
+            InitializeRpcClient();
             Oprands = new List<Node>();
             OpType = OpType.NIL;
             Condition = "";
@@ -94,6 +133,7 @@ namespace RPC
             Status = NodeStatus.WAIT;
             //   
         }
+        
         public void Execute()
         {
             // Execute oprands first
@@ -123,11 +163,26 @@ namespace RPC
             }
         }
 
-        public DataTable RemoteExecute()
+        public void RemoteExecute()
         {
             //TODO: Use rpc to execute on remote site
-           
-            return null;
+            switch (Site)
+            {
+                case 1:
+                    TmpDt=site1.RpcExcute(NodeGuid);
+                    break;
+                case 2:
+                    TmpDt=site1.RpcExcute(NodeGuid);
+                    break;
+                case 3:
+                    TmpDt=site1.RpcExcute(NodeGuid);
+                    break;
+                case 4:
+                    TmpDt=site1.RpcExcute(NodeGuid);
+                    break;
+                default: break;
+
+            }
         }
 
         private void doJoin()
@@ -170,6 +225,10 @@ namespace RPC
         }
         private void doQuery()
         {
+            MySqlConnection con = new MySqlConnection(String.Format("server={0};user id={1}; password={2}; database={3}; pooling=false", "localhost", "root", "123456", "site"+Site.ToString()));
+            MySqlDataAdapter adpt = new MySqlDataAdapter("", con);
+            adpt.SelectCommand.CommandText = "select * from "+TabName+" where "+Condition;
+            adpt.Fill(TmpDt);
         }
         private void doUnion()
         {

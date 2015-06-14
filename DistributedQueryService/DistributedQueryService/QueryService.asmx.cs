@@ -13,7 +13,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text.RegularExpressions;
-using RPC;
+using CommonLib;
 
 namespace DistributedQueryService
 {
@@ -27,13 +27,26 @@ namespace DistributedQueryService
     [System.Web.Script.Services.ScriptService]
     public class QueryService : System.Web.Services.WebService
     {
-        [WebMethod]
-        public string TestRpcServer()
+        RPC r1, r2, r3, r4;
+        public QueryService()
         {
-            TcpClientChannel cc = new TcpClientChannel("WebServiceClient",null);
-            ChannelServices.RegisterChannel(cc, false);
-            Node remoteobj = (Node)Activator.GetObject(typeof(Node), "tcp://localhost:8001/RPC");
-            return "";
+            TcpClientChannel tcc1 = new TcpClientChannel("tcc1", null);
+            tcc1.IsSecured = true;
+            ChannelServices.RegisterChannel(tcc1, true);
+            r1 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8001/RPC");
+
+            TcpClientChannel tcc2 = new TcpClientChannel("tcc2", null);
+            ChannelServices.RegisterChannel(tcc2, true);
+            r2 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8002/RPC");
+
+            TcpClientChannel tcc3 = new TcpClientChannel("tcc3", null);
+            ChannelServices.RegisterChannel(tcc3, true);
+            r3 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8003/RPC");
+
+
+            TcpClientChannel tcc4 = new TcpClientChannel("tcc4", null);
+            ChannelServices.RegisterChannel(tcc4, true);
+            r4 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8004/RPC");
         }
         [WebMethod]
         public string Sql2AlgTree(string sql)
@@ -42,7 +55,17 @@ namespace DistributedQueryService
             Node AlgTreeRoot = sat.GetAlgTree();//generate alg tree
             sat.ReplaceLeafWithSiteInfo(AlgTreeRoot);//replace leaf node with site info
             sat.AlgTreeOpt(AlgTreeRoot);//optimize alg tree, do SEL and PROJ as early as possible
-            // return sat.GetPlainAlgTree(AlgTreeRoot);       
+            //
+            r1.InitSite(1);
+            r2.InitSite(2);
+            r3.InitSite(3);
+            r4.InitSite(4);
+            //
+            r1.InitAlgTree("");
+            r2.InitAlgTree("");
+            r3.InitAlgTree("");
+            r4.InitAlgTree("");
+            //
             return sat.GetJSONAlgTree(AlgTreeRoot);
         }
         [WebMethod]
@@ -123,7 +146,7 @@ namespace DistributedQueryService
                             //
                             Node node2 = new Node();
                             node2.OpType = OpType.JOIN;
-                            node2.Condition = expr.AsText;
+                            node2.Condition = expr.AsText.Replace(" ","");
                             node2.Oprands.Add(curNode);
                             node2.Oprands.Add(node1);
                             node2.Site = 0;
@@ -138,7 +161,7 @@ namespace DistributedQueryService
                             //
                             Node node2 = new Node();
                             node2.OpType = OpType.JOIN;
-                            node2.Condition = expr.AsText;
+                            node2.Condition = expr.AsText.Replace(" ", "");
                             node2.Oprands.Add(curNode);
                             node2.Oprands.Add(node1);
                             node2.Site = 0;
@@ -164,7 +187,7 @@ namespace DistributedQueryService
                                 curNode.Oprands.Add(leftNode);
                                 curNode.Oprands.Add(rightNode);
                                 curNode.OpType = OpType.JOIN;
-                                curNode.Condition = expr.AsText;
+                                curNode.Condition = expr.AsText.Replace(" ", "");
                                 curNode.Site = 0;
                             }
                             else //不为空
@@ -173,7 +196,7 @@ namespace DistributedQueryService
                                 joinNode1.Oprands.Add(leftNode);
                                 joinNode1.Oprands.Add(rightNode);
                                 joinNode1.OpType = OpType.JOIN;
-                                joinNode1.Condition = expr.AsText;
+                                joinNode1.Condition = expr.AsText.Replace(" ", "");
                                 joinNode1.Site = 0;
                                 //
                                 Node joinNode2 = new Node();
@@ -194,7 +217,7 @@ namespace DistributedQueryService
                             Node node = new Node();
                             node.OpType = OpType.SEL;
                             node.Oprands.Add(curNode);
-                            node.Condition = expr.AsText;
+                            node.Condition = expr.AsText.Replace(" ", "");
                             node.Site = 0;
                             curNode = node;
                         }
@@ -202,7 +225,7 @@ namespace DistributedQueryService
                         {
                             curNode.OpType = OpType.LEAF;
                             curNode.TabName = tab1;
-                            curNode.Condition = expr.AsText;
+                            curNode.Condition = expr.AsText.Replace(" ", "");
                             curNode.Site = 0;
                         }
                     }
@@ -216,7 +239,7 @@ namespace DistributedQueryService
                     rootNode.Site = 0;
                     foreach (var expr in Fields)
                     {
-                        rootNode.Condition += expr + ",";
+                        rootNode.Condition += expr.Replace(" ", "") + ",";
                     }
                     if (rootNode.Condition.Length > 0)
                         rootNode.Condition = rootNode.Condition.Substring(0, rootNode.Condition.Length - 1);
@@ -228,7 +251,7 @@ namespace DistributedQueryService
                     curNode.Site = 0;
                     foreach (var expr in Fields)
                     {
-                        curNode.Condition += expr + ",";
+                        curNode.Condition += expr.Replace(" ", "") + ",";
                     }
                     if (curNode.Condition.Length > 0)
                         curNode.Condition = curNode.Condition.Substring(0, curNode.Condition.Length - 1);
