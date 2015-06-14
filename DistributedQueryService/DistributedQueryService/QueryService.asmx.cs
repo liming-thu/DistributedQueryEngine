@@ -14,6 +14,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text.RegularExpressions;
 using CommonLib;
+using System.Web.Script.Serialization;
 
 namespace DistributedQueryService
 {
@@ -43,7 +44,6 @@ namespace DistributedQueryService
             ChannelServices.RegisterChannel(tcc3, true);
             r3 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8003/RPC");
 
-
             TcpClientChannel tcc4 = new TcpClientChannel("tcc4", null);
             ChannelServices.RegisterChannel(tcc4, true);
             r4 = (RPC)Activator.GetObject(typeof(RPC), "tcp://localhost:8004/RPC");
@@ -56,17 +56,18 @@ namespace DistributedQueryService
             string originTree = sat.GetJSONAlgTree(AlgTreeRoot);
             sat.ReplaceLeafWithSiteInfo(AlgTreeRoot);//replace leaf node with site info
             sat.AlgTreeOpt(AlgTreeRoot);//optimize alg tree, do SEL and PROJ as early as possible
+            string optimized = sat.GetJSONAlgTree(AlgTreeRoot);
             //
             r1.InitSite(1);
             r2.InitSite(2);
             r3.InitSite(3);
             r4.InitSite(4);
             //
-            r1.InitAlgTree("");
-            r2.InitAlgTree("");
-            r3.InitAlgTree("");
-            r4.InitAlgTree("");
-            string optimized = sat.GetJSONAlgTree(AlgTreeRoot);
+            r1.InitAlgTree(optimized);
+            r2.InitAlgTree(optimized);
+            r3.InitAlgTree(optimized);
+            r4.InitAlgTree(optimized);
+            
             return new AjaxResult(originTree, optimized).ToString();
         }
         [WebMethod]

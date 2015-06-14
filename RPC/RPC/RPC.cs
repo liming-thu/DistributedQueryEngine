@@ -12,6 +12,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace CommonLib 
 {
@@ -52,9 +53,22 @@ namespace CommonLib
             Console.WriteLine("Init OK," + mySite.ToString());
             return "Init OK,"+mySite.ToString();
         }
+        private void RegisterTree(Node node)
+        {
+            nodeHash.Add(node.NodeGuid, node);
+            if (node.OpType != OpType.LEAF)
+            {
+                foreach (Node op in node.Oprands)
+                {
+                    RegisterTree(op);
+                }
+            }
+        }
         public void InitAlgTree(string jsonNode)
         {
-            
+            Node root = JsonConvert.DeserializeObject<Node>(jsonNode);
+            nodeHash.Clear();
+            RegisterTree(root);
         }
         public DataTable RpcExcute(Guid gid)
         {
